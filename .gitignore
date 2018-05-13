@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 Homework.egg-info/
 .ipynb_checkpoints
+.idea
 
 ### Python template
 # Byte-compiled / optimized / DLL files
