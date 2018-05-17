@@ -1,5 +1,7 @@
+from abc import ABCMeta
 
-class GeneralDescentMethod(object):
+
+class GeneralDescentMethod(metaclass=ABCMeta):
 
     def minimize(self, *args, **kwargs):
         """

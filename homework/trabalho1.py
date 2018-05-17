@@ -1,7 +1,8 @@
 import numpy as np
 from minimization.function import Function
 from minimization.unconstrained.gradient_descent import GradientDescent
-from minimization.unconstrained.line_search import ConstantLineSearch, BacktrackingLineSearch
+from minimization.unconstrained.line_search import ConstantLineSearch, BacktrackingLineSearch, ExactLineSearch
+from minimization.unconstrained.steepest_descent import SteepestDescent
 
 
 class FunctionTeam2(Function):
@@ -26,7 +27,10 @@ f = FunctionTeam2(gama=2)
 
 x_0 = np.asarray([9.5, 5])
 #search = GradientDescent(ConstantLineSearch(constant=.25))
-search = GradientDescent(BacktrackingLineSearch(alpha=.5, beta=.1))
+#search = GradientDescent(BacktrackingLineSearch(alpha=.5, beta=.1))
+search = SteepestDescent(ExactLineSearch())
+#search = SteepestDescent(BacktrackingLineSearch(alpha=.5, beta=.1))
+#search = SteepestDescent(ConstantLineSearch(constant=.25))
 history = search.minimize(f, x_0)
 
 print(history)

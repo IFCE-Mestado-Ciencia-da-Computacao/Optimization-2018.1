@@ -1,5 +1,8 @@
+import numpy as np
+
+
 class LineSearch(object):
-    def calculate(self, f, x) -> float:
+    def calculate(self, f, x, delta_x) -> float:
         pass
 
 
@@ -7,20 +10,27 @@ class ConstantLineSearch(LineSearch):
     def __init__(self, constant=1e-2):
         self.constant = constant
 
-    def calculate(self, f, x) -> float:
+    def calculate(self, f, x, delta_x) -> float:
         return self.constant
 
 
 class ExactLineSearch(LineSearch):
 
-    def calculate(self, f, x):
+    def calculate(self, f, x, delta_x):
         """
         $$t = arg min_{s>0} f(x + s \delta x)$$
 
         return t
         """
-        #t = arg min_{t>0} f(x + t delta x)
-        return
+        min_y = np.inf
+        min_t = np.inf
+        for t in np.arange(0.1, 0.9, 0.008):
+            y = f(x + t * delta_x)
+            if y < min_y:
+                min_y = y
+                min_t = t
+
+        return min_t
 
 
 class BacktrackingLineSearch(LineSearch):
@@ -33,16 +43,15 @@ class BacktrackingLineSearch(LineSearch):
         self.alpha = alpha
         self.beta = beta
 
-    def calculate(self, f, x):
+    def calculate(self, f, x, delta_x):
         """
-        :param Function f:
-        :param ndarray x:
+        given a descent direction ∆x for f at x ∈ dom f , α \in (0, 0.5), β \in (0, 1).
 
-        :return:
+        t = 1.
+        while f(x + t∆x) > f(x) + αt ∇f(x).T ∆x:
+            t = βt.
         """
         grad = f.gradient(x)
-        delta_x = - grad
-
         t = 1
 
         while all(f(x + t*delta_x) > f(x) + self.alpha * t * grad.T * delta_x):
