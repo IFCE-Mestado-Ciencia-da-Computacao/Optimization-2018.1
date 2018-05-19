@@ -51,10 +51,10 @@ class BacktrackingLineSearch(LineSearch):
         while f(x + t∆x) > f(x) + αt ∇f(x).T ∆x:
             t = βt.
         """
-        grad = f.gradient(x)
+        gradient = f.gradient(x)
         t = 1
 
-        while all(f(x + t*delta_x) > f(x) + self.alpha * t * grad.T * delta_x):
+        while f(x + t*delta_x) > f(x) + self.alpha * t * gradient.T @ delta_x:
             t = self.beta * t
 
         return t
