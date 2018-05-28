@@ -16,6 +16,11 @@ class ConstantLineSearch(LineSearch):
 
 class ExactLineSearch(LineSearch):
 
+    def __init__(self, minimum=0.01, maximum=0.9, number_steps=200):
+        self.min = minimum
+        self.max = maximum
+        self.step_size = (maximum - minimum) / number_steps
+
     def calculate(self, f, x, delta_x):
         """
         $$t = arg min_{s>0} f(x + s \delta x)$$
@@ -24,7 +29,8 @@ class ExactLineSearch(LineSearch):
         """
         min_y = np.inf
         min_t = np.inf
-        for t in np.arange(0.1, 0.9, 0.008):
+
+        for t in np.arange(self.min, self.max, self.step_size):
             y = f(x + t * delta_x)
             if y < min_y:
                 min_y = y
