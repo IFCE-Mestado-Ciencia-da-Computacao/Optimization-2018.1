@@ -12,7 +12,7 @@ class FirstOrderDescent(GeneralDescentMethod, metaclass=ABCMeta):
         """
         self.line_search = line_search
 
-    def minimize(self, f, x, tolerance=1e-4, iterations=int(1e3)):
+    def minimize(self, f, x, tolerance=1e-4, iterations=60):
         """
         k = iteration
         Δx = 'step' or 'search direction'

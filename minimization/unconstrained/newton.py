@@ -12,7 +12,7 @@ class Newton(GeneralDescentMethod):
         """
         self.line_search = line_search
 
-    def minimize(self, f, x, tolerance=1e-4, iterations=int(1e3)):
+    def minimize(self, f, x, tolerance=1e-4, iterations=60):
         """
         given a starting point x ∈ dom f , tolerance ǫ > 0.
 

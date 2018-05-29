@@ -33,7 +33,7 @@ class FunctionTeam2(Function):
 
 methods_exact_line_search = [
     #GradientDescent(ConstantLineSearch(constant=.25)),
-    SteepestDescent(ExactLineSearch()),
+    GradientDescent(ExactLineSearch()),
     SteepestDescent(ExactLineSearch()),
 ]
 methods_backtracking_line_search = [
@@ -48,8 +48,8 @@ parameters = pd.read_csv('parameters.csv', sep=';')
 
 data = []
 
-alphas = np.arange(0.01, 0.9, (0.9 - 0.01)/200)
-betas = np.arange(0.01, 0.9, (0.9 - 0.01)/200)
+alphas = np.arange(0.01, 0.9, (0.9 - 0.01)/20)
+betas = np.arange(0.01, 0.9, (0.9 - 0.01)/20)
 
 for id_parameter, row in parameters.iterrows():
     x_0, x_1, gama = row
