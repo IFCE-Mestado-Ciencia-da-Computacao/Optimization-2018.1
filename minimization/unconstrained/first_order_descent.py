@@ -27,20 +27,22 @@ class FirstOrderDescent(GeneralDescentMethod, metaclass=ABCMeta):
         :param float tolerance: $\eta$
         :param int iterations:
         """
-        history = [x]
+        history = []
+        delta_x = 1
 
         for k in range(iterations):
             delta_x = self.calculate_delta_x(f, x)
             t = self.line_search.calculate(f, x, delta_x)
 
-            x = x + t * delta_x
+            history.append([x, norm(-delta_x)])
 
-            history.append(x)
+            x = x + t * delta_x
 
             if norm(-delta_x) <= tolerance:
                 break
 
-        return np.asarray(history)
+        history.append([x, norm(-delta_x)])
+        return np.array(history)
 
     @abstractmethod
     def calculate_delta_x(self, f, x):

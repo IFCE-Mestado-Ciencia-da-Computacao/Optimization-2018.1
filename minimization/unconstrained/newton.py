@@ -29,18 +29,19 @@ class Newton(GeneralDescentMethod):
         :param float tolerance: $\eta$
         :param int iterations:
         """
-        history = [x]
+        history = []
 
         for k in range(iterations):
             delta_x = - inv(f.hessian(x)) @ f.gradient(x)
 
             lambda_square = f.gradient(x).T @ inv(f.hessian(x)) @ f.gradient(x)
+            history.append([x, lambda_square])
+
             if lambda_square/2 <= tolerance:
                 break
 
             t = self.line_search.calculate(f, x, delta_x)
 
             x = x + t * delta_x
-            history.append(x)
 
-        return np.asarray(history)
+        return np.array(history)
