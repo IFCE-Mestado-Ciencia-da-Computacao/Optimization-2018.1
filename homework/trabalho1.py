@@ -78,7 +78,8 @@ methods_backtracking_line_search = [
 from itertools import product
 import pandas as pd
 
-parameters = pd.read_csv('parameters.csv', sep=';')
+#parameters = pd.read_csv('parameters.csv', sep=';')
+parameters = pd.read_csv('parameters-normal.csv', sep=',')
 
 data = Data()
 
