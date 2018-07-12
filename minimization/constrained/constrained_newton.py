@@ -1,18 +1,21 @@
 import numpy as np
-from numpy.linalg import inv, pinv, ldl
+from numpy.linalg import inv
 
+from minimization.constrained.kkt.kkt_matrix import KKTMatrixFeasible
 from minimization.unconstrained.general_descent_method import GeneralDescentMethod
 
 
 class ConstrainedNewtonFeasible(GeneralDescentMethod):
 
-    def __init__(self, line_search):
+    def __init__(self, line_search, kkt_solver):
         """
         :param LineSearch line_search:
+        :param KKTSolver kkt_solver:
         """
         self.line_search = line_search
+        self.kkt_solver = kkt_solver
 
-    def minimize(self, f, x, h, tolerance=1e-4, iterations=120):
+    def minimize(self, f, h, x, tolerance=1e-4, iterations=120):
         """
         :param h: Restrictions
         """
@@ -20,8 +23,10 @@ class ConstrainedNewtonFeasible(GeneralDescentMethod):
 
         for k in range(iterations):
             # 1. Compute the Newton step and decrement Δx_{nt}, λ(x)
-            delta_x = RESOLVER KKT
-            lambda_square = f.gradient(x).T @ inv(f.hessian(x)) @ f.gradient(x)
+            delta_x = self.delta_x(f, h, x)
+            lambda_square = - f.gradient(x).T @ delta_x
+
+            history.append(np.concatenate([[f(x)], *x, lambda_square[0]]))
 
             # 2. Stopping criterion. quit if λ^2/2 <= tolerance
             if lambda_square/2 <= tolerance:
@@ -35,15 +40,11 @@ class ConstrainedNewtonFeasible(GeneralDescentMethod):
 
         return np.array(history)
 
-    def delta_x(self):
-        """
-        |∇2f(x) A^T| = |delta_x| = | ∇f(x)|
-        |A        0| = |      w| = |Ax - b|
-        """
-        A = A
+    def delta_x(self, f, h, x):
+        matrix = KKTMatrixFeasible(f, h, x)
 
-        de
-        pass
+        delta_x, w = self.kkt_solver.calculate(matrix)
+        return delta_x
 
 
 class ConstrainedNewtonInfeasible(object):
@@ -59,7 +60,7 @@ class ConstrainedNewtonInfeasible(object):
 
             # Backtracking line search on ||r||_2
             t = 1
-            while
+            while 1:
                 t = beta * t
 
             t = self.line_search.calculate(f, x, delta_x)
@@ -67,8 +68,8 @@ class ConstrainedNewtonInfeasible(object):
             x = x + t * delta_x
             v = v + t * delta_v
 
-            if not A*x == b or not ||r(x, v)||_2 <= tolerance:
-                break
+            #if not A*x == b or not ||r(x, v)||_2 <= tolerance:
+            #    break
 
         return np.array(history)
 
@@ -81,11 +82,3 @@ class ConstrainedNewtonInfeasible(object):
 
         de
         pass
-
-
-def KKT_LDL():
-    """
-    file:///home/paulo/Downloads/LDL%20factorization%20for%20dummies.pdf
-    :return:
-    """
-    return ldl()

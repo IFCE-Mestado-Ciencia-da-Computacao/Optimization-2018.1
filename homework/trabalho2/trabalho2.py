@@ -1,18 +1,20 @@
-from minimization.constrained.ConstrainedNewton import ConstrainedNewtonFeasible
-from minimization.constrained.LinearRestrictions import LinearRestrictions
+import numpy as np
+import pandas as pd
+
+from minimization.constrained.constrained_newton import ConstrainedNewtonFeasible
+from minimization.constrained.equality_restrictions import LinearRestrictions
+from minimization.constrained.kkt.kkt_solver import KKTSolver, lapark_method, ldl_method
 from minimization.function import Function
 from minimization.unconstrained.line_search import BacktrackingLineSearch
-
-import numpy as np
 
 
 class HomeworkFunction(Function):
 
     def __call__(self, x):
-        return x**3/2
+        return (x**(3/2)).sum()
 
     def gradient(self, x):
-        return 3/2 * x ** 1/2
+        return 3/2 * x**(1/2)
 
     def hessian(self, x):
         diagonal = np.eye(len(x))
@@ -28,9 +30,18 @@ class HomeworkRestrictions(LinearRestrictions):
 
 f = HomeworkFunction()
 h = HomeworkRestrictions()
-α = .2
-β = .5
+α = .3#25
+β = .8#7
+x = np.array([[2., 6.]]).T
 
-newton = ConstrainedNewtonFeasible(BacktrackingLineSearch(alpha=α, beta=β))
-x = [0, 8]
-newton.minimize(f, x, h, tolerance=10**-8)
+#solver = KKTSolver(lapark_method)
+solver = KKTSolver(ldl_method)
+
+newton = ConstrainedNewtonFeasible(BacktrackingLineSearch(alpha=α, beta=β), solver)
+history = newton.minimize(f, h, x, tolerance=10**-20)
+
+len(history)
+
+data = pd.DataFrame(data=history, columns=['f', 'x_0', 'x_1', 'error'])
+#data = pd.DataFrame(data=history, columns=['f', 'x', 'y'])
+data.to_csv('results.csv', sep=',', index=False)

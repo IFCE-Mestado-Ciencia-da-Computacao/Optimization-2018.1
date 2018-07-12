@@ -48,7 +48,7 @@ setup(
     },
     install_requires=[
         'numpy',
-        'pandas'
+        'pandas', 'scipy'
     ],
 
     test_suite='test',
