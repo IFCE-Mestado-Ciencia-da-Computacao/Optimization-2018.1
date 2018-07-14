@@ -13,7 +13,6 @@ from minimization.constrained.kkt.kkt_solver import KKTSolver, lapark_method, ld
     pseudo_inverse_method, kkt_elimination
 from minimization.function import Function
 from minimization.unconstrained.line_search import BacktrackingLineSearch
-from minimization.util import concatenate
 
 
 class HomeworkFunction(Function):
