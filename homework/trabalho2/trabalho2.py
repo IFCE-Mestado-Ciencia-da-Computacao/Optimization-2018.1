@@ -97,6 +97,7 @@ newton_infeasible = (ConstrainedNewtonInfeasible, BacktrackingLineSearchInfeasib
 α = .3
 β = .8
 
+data_times = []
 
 for index, x_feasible in enumerate(x_infeasibles):
     for method, (Newton, Backtracking) in product(methods, [newton_feasible]):
@@ -109,15 +110,12 @@ for index, x_feasible in enumerate(x_infeasibles):
         history = newton.minimize(f, h, x_feasible, tolerance=10**-10)
         stop = timeit.default_timer()
 
-        name = h.__class__.__name__ + Newton.__name__ + '-' + str(index) + '-' + method.__name__ + '-' + Backtracking.__name__
+        name = h.__class__.__name__ + '-' + Newton.__name__ + '-' + str(index) + '-' + method.__name__ + '-' + Backtracking.__name__
 
         data = pd.DataFrame(data=history, columns=columns_feasible)
         data.to_csv('results/' + name + '.csv', sep=',', index=False)
 
-        print(stop-start)
-
-
-print()
+        data_times.append([stop-start, *name.split('-')])
 
 
 for index, x_infeasible in enumerate(x_infeasibles):
@@ -132,9 +130,13 @@ for index, x_infeasible in enumerate(x_infeasibles):
         history = newton.minimize(f, h, x_infeasible, tolerance=10**-10)
         stop = timeit.default_timer()
 
-        name = h.__class__.__name__ + Newton.__name__ + '-' + str(index) + '-' + method.__name__ + '-' + Backtracking.__name__
+        name = h.__class__.__name__ + '-' + Newton.__name__ + '-' + str(index) + '-' + method.__name__ + '-' + Backtracking.__name__
 
         data = pd.DataFrame(data=history, columns=columns_infeasible)
         data.to_csv('results/' + name + '.csv', sep=',', index=False)
 
-        print(stop-start)
+        data_times.append([stop - start, *name.split('-')])
+
+times = pd.DataFrame(data=data_times, columns=['time', 'restriction', 'newton', 'x_0', 'method', 'backtracking'])
+times.to_csv('results/times.csv', sep=',', index=False)
+print(times)
