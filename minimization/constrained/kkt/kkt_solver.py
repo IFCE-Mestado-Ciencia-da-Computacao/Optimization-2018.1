@@ -54,7 +54,7 @@ def kkt_elimination(A, b, matrix):
     H = matrix.f.hessian(x)
     H_inv = np.linalg.inv(H)
 
-    # Extract 'g' and 'h' from b
+    # Extract 'g' and 'h' from -b
     g, h = np.split(-b, [x.shape[0]])
 
     w = np.linalg.solve(A @ H_inv @ A.T, h - A @ H_inv @ g)

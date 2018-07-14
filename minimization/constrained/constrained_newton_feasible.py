@@ -6,13 +6,14 @@ from minimization.unconstrained.general_descent_method import GeneralDescentMeth
 
 class ConstrainedNewtonFeasible(GeneralDescentMethod):
 
-    def __init__(self, line_search, kkt_solver):
+    def __init__(self, line_search, kkt_solver, inspect=None):
         """
         :param LineSearch line_search:
         :param KKTSolver kkt_solver:
         """
         self.line_search = line_search
         self.kkt_solver = kkt_solver
+        self.inspect = inspect if inspect is not None else lambda f, h, x, ν, k: None
 
     def minimize(self, f, h, x, tolerance=1e-4, iterations=60):
         """
@@ -25,7 +26,7 @@ class ConstrainedNewtonFeasible(GeneralDescentMethod):
             delta_x = self.delta_x(f, h, x)
             lambda_square = - f.gradient(x).T @ delta_x
 
-            history.append(np.concatenate([[f(x)], *x, lambda_square[0]]))
+            history.append(self.inspect(f, h, x, 0, k, lambda_square[0]))
 
             # 2. Stopping criterion. quit if λ^2/2 <= tolerance
             if lambda_square/2 <= tolerance:

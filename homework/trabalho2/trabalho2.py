@@ -3,8 +3,8 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
-from numpy.linalg import norm
 
+from minimization.constrained.inspect import inspect_2d_feasible, inspect_2d_infeasible, inspect_feasible, inspect_infeasible
 from minimization.constrained.backtracking_line_search_infeasible import BacktrackingLineSearchInfeasible
 from minimization.constrained.constrained_newton_feasible import ConstrainedNewtonFeasible
 from minimization.constrained.constrained_newton_infeasible import ConstrainedNewtonInfeasible
@@ -13,6 +13,7 @@ from minimization.constrained.kkt.kkt_solver import KKTSolver, lapark_method, ld
     pseudo_inverse_method, kkt_elimination
 from minimization.function import Function
 from minimization.unconstrained.line_search import BacktrackingLineSearch
+from minimization.util import concatenate
 
 
 class HomeworkFunction(Function):
@@ -35,63 +36,105 @@ class HomeworkRestrictions(LinearRestrictions):
         self.b = np.array([[8]]).T
 
 
-def inspect_2d_infeasible(f, h, x, ν, k):
-    return np.concatenate([
-        [f(x)],
-        *x,
-        [norm(ConstrainedNewtonInfeasible.r_primal(f, h, x, ν)), norm(ConstrainedNewtonInfeasible.r_dual(h, x))]
-    ])
+class HomeworkRestrictionsFull(LinearRestrictions):
+
+    def __init__(self, x_0, p):
+        """
+        :param x_0: First position of x
+        :param p: Number of restrictions
+        """
+        n = x_0.shape[0]
+
+        self.A = self.generate_A(n, p)
+        self.b = self.A@x_0
+
+    def generate_A(self, n, p):
+        """
+        :param n: Number of variables
+        :param p: Number of restrictions
+        """
+        a = np.ones((p, p))
+        np.fill_diagonal(a, 0)
+        b = np.ones((p, n - p))
+
+        return np.concatenate((a, b), axis=1)
 
 
-def inspect_infeasible(f, h, x, ν, k):
-    return np.concatenate([
-        [f(x)],
-        [norm(ConstrainedNewtonInfeasible.r_primal(f, h, x, ν)), norm(ConstrainedNewtonInfeasible.r_dual(h, x))]
-    ])
+def random_x_0(n):
+    return np.random.randint(low=10, high=100, size=(n, 1)).astype(dtype=np.float32)
 
 
+np.random.seed(42)
+
+
+# Duas variáveis
 f = HomeworkFunction()
-h = HomeworkRestrictions()
-α = .3
-β = .8
-x_feasible = np.array([[2, 6]]).T
-x_infeasible = np.array([[9, 6]]).T
+#h = HomeworkRestrictions()
+#x_feasible = np.array([[2, 6]]).T
+#x_infeasible = np.array([[9, 6]]).T
+#columns_feasible = ['f', 'x_0', 'x_1', 'error']
+#columns_infeasible = ['f', 'x_0', 'x_1', 'norm-r_primal', 'norm-r_dual']
+#inspect_feasible_function = inspect_2d_feasible
+#inspect_infeasible_function = inspect_2d_infeasible
 
+
+# n variáveis
+n = 200
+p = 120
+
+x_feasibles = [random_x_0(n) for i in range(5)]
+x_infeasibles = [random_x_0(n) for i in range(5)]
+
+columns_feasible = ['f', 'error']
+columns_infeasible = ['f', 'norm-r_primal', 'norm-r_dual']
+inspect_feasible_function = inspect_feasible
+inspect_infeasible_function = inspect_infeasible
 
 methods = [lapark_method, ldl_method, inverse_method, pseudo_inverse_method, kkt_elimination]
 newton_feasible = (ConstrainedNewtonFeasible, BacktrackingLineSearch)
 newton_infeasible = (ConstrainedNewtonInfeasible, BacktrackingLineSearchInfeasible)
 
+α = .3
+β = .8
 
-for method, (Newton, Backtracking) in product(methods, [newton_feasible]):
-    solver = KKTSolver(method)
 
-    newton = Newton(Backtracking(alpha=α, beta=β), solver)
-    start = timeit.default_timer()
-    history = newton.minimize(f, h, x_feasible, tolerance=10**-12)
-    stop = timeit.default_timer()
+for index, x_feasible in enumerate(x_infeasibles):
+    for method, (Newton, Backtracking) in product(methods, [newton_feasible]):
+        h = HomeworkRestrictionsFull(x_feasible, 120)
 
-    name = method.__name__ + '-' + Newton.__name__ + '-' + Backtracking.__name__
+        solver = KKTSolver(method)
 
-    data = pd.DataFrame(data=history, columns=['f', 'x_0', 'x_1', 'error'])
-    data.to_csv('results/' + name + '.csv', sep=',', index=False)
+        newton = Newton(Backtracking(alpha=α, beta=β), solver, inspect=inspect_feasible_function)
+        start = timeit.default_timer()
+        history = newton.minimize(f, h, x_feasible, tolerance=10**-10)
+        stop = timeit.default_timer()
 
-    print(stop-start)
+        name = h.__class__.__name__ + Newton.__name__ + '-' + str(index) + '-' + method.__name__ + '-' + Backtracking.__name__
+
+        data = pd.DataFrame(data=history, columns=columns_feasible)
+        data.to_csv('results/' + name + '.csv', sep=',', index=False)
+
+        print(stop-start)
+
 
 print()
 
-for method, (Newton, Backtracking) in product(methods, [newton_infeasible]):
-    solver = KKTSolver(method)
 
-    newton = Newton(Backtracking(alpha=α, beta=β), solver, inspect_2d_infeasible)
+for index, x_infeasible in enumerate(x_infeasibles):
+    for method, (Newton, Backtracking) in product(methods, [newton_infeasible]):
+        h = HomeworkRestrictionsFull(x_feasibles[index], 120)
 
-    start = timeit.default_timer()
-    history = newton.minimize(f, h, x_infeasible, tolerance=10**-12)
-    stop = timeit.default_timer()
+        solver = KKTSolver(method)
 
-    name = method.__name__ + '-' + Newton.__name__ + '-' + Backtracking.__name__
+        newton = Newton(Backtracking(alpha=α, beta=β), solver, inspect=inspect_infeasible_function)
 
-    data = pd.DataFrame(data=history, columns=['f', 'x_0', 'x_1', 'norm-r_primal', 'norm-r_dual'])
-    data.to_csv('results/' + name + '.csv', sep=',', index=False)
+        start = timeit.default_timer()
+        history = newton.minimize(f, h, x_infeasible, tolerance=10**-10)
+        stop = timeit.default_timer()
 
-    print(stop-start)
+        name = h.__class__.__name__ + Newton.__name__ + '-' + str(index) + '-' + method.__name__ + '-' + Backtracking.__name__
+
+        data = pd.DataFrame(data=history, columns=columns_infeasible)
+        data.to_csv('results/' + name + '.csv', sep=',', index=False)
+
+        print(stop-start)

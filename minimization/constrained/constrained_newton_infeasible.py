@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 from numpy.linalg import norm
 
@@ -37,7 +38,7 @@ class ConstrainedNewtonInfeasible(GeneralDescentMethod):
             x = x + t * delta_x
             ν = ν + t * delta_ν
 
-            if (h.A@x == h.b) and norm(r(x, ν)) <= tolerance:
+            if np.allclose(h.A@x, h.b) and norm(r(x, ν)) <= tolerance:
                 break
 
         history.append(self.inspect(f, h, x, ν, len(history)))
