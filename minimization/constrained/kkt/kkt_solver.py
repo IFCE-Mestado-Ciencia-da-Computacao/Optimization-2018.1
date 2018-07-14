@@ -57,9 +57,6 @@ def kkt_elimination(A, b, matrix):
     # Extract 'g' and 'h' from b
     g, h = np.split(-b, [x.shape[0]])
 
-    # Shur complement S
-    #S = -A @ H_inv @ A.T
-    #w = np.linalg.solve(S, A @ H_inv @ g - h)
     w = np.linalg.solve(A @ H_inv @ A.T, h - A @ H_inv @ g)
     v = np.linalg.solve(H, -(g + A.T @ w))
 
