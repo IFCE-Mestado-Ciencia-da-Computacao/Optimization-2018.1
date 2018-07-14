@@ -42,14 +42,19 @@ class KKTMatrixFeasible(object):
 
 class KKTMatrixInfeasible(KKTMatrixFeasible):
 
+    def __init__(self, f: Function, h: LinearRestrictions, x, ν):
+        super().__init__(f, h, x)
+        self.ν = ν
+
     @property
     def b(self):
         x = self.x
         f = self.f
         A = self.h.A
         b = self.h.b
+        ν = self.ν
 
         return - concatenate([
-            [f.gradient(x) + A.T @ v],
+            [f.gradient(x) + A.T @ ν],
             [A @ x - b]
         ])

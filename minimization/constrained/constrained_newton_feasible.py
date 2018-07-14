@@ -1,5 +1,4 @@
 import numpy as np
-from numpy.linalg import inv
 
 from minimization.constrained.kkt.kkt_matrix import KKTMatrixFeasible
 from minimization.unconstrained.general_descent_method import GeneralDescentMethod
@@ -15,7 +14,7 @@ class ConstrainedNewtonFeasible(GeneralDescentMethod):
         self.line_search = line_search
         self.kkt_solver = kkt_solver
 
-    def minimize(self, f, h, x, tolerance=1e-4, iterations=120):
+    def minimize(self, f, h, x, tolerance=1e-4, iterations=60):
         """
         :param h: Restrictions
         """
@@ -45,40 +44,3 @@ class ConstrainedNewtonFeasible(GeneralDescentMethod):
 
         delta_x, w = self.kkt_solver.calculate(matrix)
         return delta_x
-
-
-class ConstrainedNewtonInfeasible(object):
-
-    def minimize(self, f, x, tolerance=1e-4, iterations=60):
-        history = []
-
-        for k in range(iterations):
-            # Primal Newton step
-            delta_x = - inv(f.hessian(x)) @ f.gradient(x)
-            # Dual Newton step
-            delta_v
-
-            # Backtracking line search on ||r||_2
-            t = 1
-            while 1:
-                t = beta * t
-
-            t = self.line_search.calculate(f, x, delta_x)
-
-            x = x + t * delta_x
-            v = v + t * delta_v
-
-            #if not A*x == b or not ||r(x, v)||_2 <= tolerance:
-            #    break
-
-        return np.array(history)
-
-    def delta_x(self):
-        """
-        |∇2f(x) A^T| = |delta_x| = | ∇f(x)|
-        |A        0| = |      w| = |Ax - b|
-        """
-        A = A
-
-        de
-        pass

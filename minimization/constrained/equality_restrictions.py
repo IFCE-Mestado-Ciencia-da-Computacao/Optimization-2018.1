@@ -8,3 +8,9 @@ class LinearRestrictions(metaclass=ABCMeta):
     """
     def __call__(self, *args, **kwargs):
         pass
+
+    def __len__(self):
+        """
+        Total de restrições definidas
+        """
+        return self.A.shape[0]
