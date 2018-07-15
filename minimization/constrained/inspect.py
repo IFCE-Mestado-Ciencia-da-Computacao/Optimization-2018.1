@@ -15,7 +15,8 @@ def inspect_2d_feasible(f, h, x, ν, k, lambda_square):
 def inspect_feasible(f, h, x, ν, k, lambda_square):
     return np.concatenate([
         [f(x)],
-        lambda_square
+        lambda_square,
+        x.T[0]
     ])
 
 
@@ -29,6 +30,7 @@ def inspect_2d_infeasible(f, h, x, ν, k):
 
 def inspect_infeasible(f, h, x, ν, k):
     return np.concatenate([
-        [f(x)],
-        [norm(ConstrainedNewtonInfeasible.r_primal(f, h, x, ν)), norm(ConstrainedNewtonInfeasible.r_dual(h, x))]
+        [norm(ConstrainedNewtonInfeasible.r_primal(f, h, x, ν)), norm(ConstrainedNewtonInfeasible.r_dual(h, x))],
+        [norm(ConstrainedNewtonInfeasible.r(f, h)(x, ν))],
+        x.T[0],
     ])

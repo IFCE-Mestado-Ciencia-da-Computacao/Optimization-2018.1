@@ -65,7 +65,6 @@ def random_x_0(n):
 
 np.random.seed(42)
 
-
 # Duas variáveis
 f = HomeworkFunction()
 #h = HomeworkRestrictions()
@@ -84,8 +83,8 @@ p = 120
 x_feasibles = [random_x_0(n) for i in range(5)]
 x_infeasibles = [random_x_0(n) for i in range(5)]
 
-columns_feasible = ['f', 'error']
-columns_infeasible = ['f', 'norm-r_primal', 'norm-r_dual']
+columns_feasible = ['f', 'error', *['x_' + str(i) for i in range(1, n+1)]]
+columns_infeasible = ['f', 'norm-r_primal', 'norm-r_dual', 'norm_r', *['x_' + str(i) for i in range(1, n)]]
 inspect_feasible_function = inspect_feasible
 inspect_infeasible_function = inspect_infeasible
 
